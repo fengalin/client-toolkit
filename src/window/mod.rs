@@ -109,6 +109,7 @@ pub enum Event {
 ///
 /// If you don't care about it, you should use `FollowServer` (which is the
 /// SCTK default). It'd be the most ergonomic for your users.
+#[derive(Clone, Copy, Debug)]
 pub enum Decorations {
     /// Request server-side decorations
     ServerSide,
