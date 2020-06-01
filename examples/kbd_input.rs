@@ -65,7 +65,7 @@ fn main() {
      * Keyboard initialization
      */
 
-    let mut seats = Vec::<(String, Option<(wl_keyboard::WlKeyboard, calloop::Source<_>)>)>::new();
+    let mut seats = Vec::<(String, Option<(wl_keyboard::WlKeyboard, calloop::Token)>)>::new();
 
     // first process already existing seats
     for seat in env.get_all_seats() {
@@ -81,8 +81,8 @@ fn main() {
                     RepeatKind::System,
                     move |event, _, _| print_keyboard_event(event, &seat_name),
                 ) {
-                    Ok((kbd, repeat_source)) => {
-                        seats.push((name, Some((kbd, repeat_source))));
+                    Ok((kbd, repeat_token)) => {
+                        seats.push((name, Some((kbd, repeat_token))));
                     }
                     Err(e) => {
                         eprintln!("Failed to map keyboard on seat {} : {:?}.", name, e);
@@ -118,8 +118,8 @@ fn main() {
                     RepeatKind::System,
                     move |event, _, _| print_keyboard_event(event, &seat_name),
                 ) {
-                    Ok((kbd, repeat_source)) => {
-                        *opt_kbd = Some((kbd, repeat_source));
+                    Ok((kbd, repeat_token)) => {
+                        *opt_kbd = Some((kbd, repeat_token));
                     }
                     Err(e) => {
                         eprintln!("Failed to map keyboard on seat {} : {:?}.", seat_data.name, e)
@@ -127,10 +127,10 @@ fn main() {
                 }
             }
         } else {
-            if let Some((kbd, source)) = opt_kbd.take() {
+            if let Some((kbd, kbd_token)) = opt_kbd.take() {
                 // the keyboard has been removed, cleanup
                 kbd.release();
-                loop_handle.remove(source);
+                loop_handle.remove(kbd_token);
             }
         }
     });

@@ -177,7 +177,7 @@ pub fn map_keyboard_repeat<F, Data: 'static>(
     rmlvo: Option<RMLVO>,
     repeatkind: RepeatKind,
     callback: F,
-) -> Result<(wl_keyboard::WlKeyboard, calloop::Source<RepeatSource>), Error>
+) -> Result<(wl_keyboard::WlKeyboard, calloop::Token), Error>
 where
     F: FnMut(Event<'_>, wl_keyboard::WlKeyboard, wayland_client::DispatchData<'_>) + 'static,
 {

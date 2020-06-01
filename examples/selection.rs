@@ -6,7 +6,7 @@ use std::io::{BufWriter, Read, Seek, SeekFrom, Write};
 use byteorder::{NativeEndian, WriteBytesExt};
 
 use sctk::{
-    data_device::{DataSourceEvent, ReadPipe},
+    data_device::DataSourceEvent,
     environment::Environment,
     primary_selection::PrimarySelectionSourceEvent,
     seat::keyboard::{map_keyboard_repeat, Event as KbEvent, KeyState, RepeatKind},
@@ -15,7 +15,7 @@ use sctk::{
 };
 
 use sctk::reexports::{
-    calloop::{LoopHandle, Source},
+    calloop::{LoopHandle, Token},
     client::{
         protocol::{wl_keyboard, wl_seat, wl_shm, wl_surface},
         DispatchData,
@@ -26,7 +26,7 @@ sctk::default_environment!(SelectionExample, desktop);
 
 // Here the type parameter is a global value that will be shared by
 // all callbacks invoked by the event loop.
-type DData = (Environment<SelectionExample>, Option<WEvent>, Option<Source<ReadPipe>>);
+type DData = (Environment<SelectionExample>, Option<WEvent>, Option<Token>);
 
 fn main() {
     /*
@@ -183,7 +183,7 @@ fn process_keyboard_event(
     handle: &LoopHandle<DData>,
     mut ddata: DispatchData,
 ) {
-    let (env, _, opt_source) = ddata.get::<DData>().unwrap();
+    let (env, _, opt_reader_token) = ddata.get::<DData>().unwrap();
     match event {
         KbEvent::Key { state, utf8: Some(text), serial, .. } => {
             if text == "p" && state == KeyState::Pressed {
@@ -215,7 +215,7 @@ fn process_keyboard_event(
                             println!("Buffer contains text, going to read it...");
                             let reader = offer.receive("text/plain;charset=utf-8".into()).unwrap();
                             let src_handle = handle.clone();
-                            let source = handle
+                            let reader_token = handle
                                 .insert_source(reader, move |(), file, ddata| {
                                     let mut txt = String::new();
                                     file.read_to_string(&mut txt).unwrap();
@@ -225,7 +225,7 @@ fn process_keyboard_event(
                                     }
                                 })
                                 .unwrap();
-                            *opt_source = Some(source);
+                            *opt_reader_token = Some(reader_token);
                         }
                     });
                 })
@@ -265,7 +265,7 @@ fn process_keyboard_event(
                             println!("Buffer contains text, going to read it...");
                             let reader = offer.receive("text/plain;charset=utf-8".into()).unwrap();
                             let src_handle = handle.clone();
-                            let source = handle
+                            let reader_token = handle
                                 .insert_source(reader, move |(), file, ddata| {
                                     let mut txt = String::new();
                                     file.read_to_string(&mut txt).unwrap();
@@ -276,7 +276,7 @@ fn process_keyboard_event(
                                 })
                                 .unwrap();
 
-                            *opt_source = Some(source);
+                            *opt_reader_token = Some(reader_token);
                         }
                     })
                 })

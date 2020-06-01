@@ -2,7 +2,7 @@ use std::io;
 
 use calloop::{
     generic::{Fd, Generic},
-    EventSource, InsertError, Interest, LoopHandle, Mode, Source,
+    EventSource, InsertError, Interest, LoopHandle, Mode,
 };
 
 use wayland_client::EventQueue;
@@ -33,7 +33,7 @@ impl WaylandSource {
     pub fn quick_insert<Data: 'static>(
         self,
         handle: LoopHandle<Data>,
-    ) -> Result<Source<WaylandSource>, InsertError<WaylandSource>> {
+    ) -> Result<calloop::Token, InsertError<WaylandSource>> {
         handle.insert_source(self, |(), queue, ddata| {
             queue.dispatch_pending(ddata, |event, object, _| {
                 panic!(
