@@ -196,7 +196,7 @@ pub fn clone_seat_data(seat: &wl_seat::WlSeat) -> Option<SeatData> {
 pub fn with_seat_data<T, F: FnOnce(&SeatData) -> T>(seat: &wl_seat::WlSeat, f: F) -> Option<T> {
     if let Some(ref udata_mutex) = seat.as_ref().user_data().get::<Mutex<SeatData>>() {
         let udata = udata_mutex.lock().unwrap();
-        Some(f(&*udata))
+        Some(f(&udata))
     } else {
         None
     }

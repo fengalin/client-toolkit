@@ -132,12 +132,7 @@ pub fn map_keyboard<F>(
 where
     F: FnMut(Event<'_>, wl_keyboard::WlKeyboard, wayland_client::DispatchData<'_>) + 'static,
 {
-    let has_kbd = super::with_seat_data(seat, |data| data.has_keyboard).unwrap_or(false);
-    let keyboard = if has_kbd {
-        seat.get_keyboard()
-    } else {
-        return Err(Error::NoKeyboard);
-    };
+    let keyboard = seat.get_keyboard();
 
     let state = Rc::new(RefCell::new(rmlvo.map(KbState::from_rmlvo).unwrap_or_else(KbState::new)?));
 
